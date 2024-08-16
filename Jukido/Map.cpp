@@ -47,6 +47,19 @@ const Map::TilesMapType Map::PACMAN_MAP2 =
 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
+const Map::TilesMapType Map::FLAT =
+{
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0},
+	{0,0,1,1,0,1,0,1,1,1,0,1,0,1,1,0,0},
+	{0,0,1,0,0,0,0,1,0,1,0,0,0,0,1,0,0},
+	{0,0,1,0,1,1,0,0,0,0,0,1,1,0,1,0,0},
+	{0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0},
+	{0,0,1,0,1,1,0,1,0,1,0,1,1,0,1,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+};
+
 Map::Map()
 {
 	createTileShapes();
@@ -59,14 +72,14 @@ bool Map::isTileBlocked(const sf::Vector2f& position) const
 
 	if (x >= m_tilesMap[0].size() || x < 0)
 	{
-		assert(false && "Invalid x was passed for the map Check");
-		return false;
+		//assert(false && "Invalid x was passed for the map Check");
+		return true;
 	}
 
 	if (y >= m_tilesMap.size() || y < 0)
 	{
-		assert(false && "Invalid x was passed for the map Check");
-		return false;
+		//assert(false && "Invalid x was passed for the map Check");
+		return true;
 	}
 
 	return m_tilesMap[y][x];

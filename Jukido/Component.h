@@ -2,6 +2,8 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 
+#include "Projectile.h"
+
 class GameObject;
 class Player;
 
@@ -32,6 +34,16 @@ private:
 
     sf::Sound m_jumpSound;
     sf::SoundBuffer m_buffer;
+};
+
+class PlayerMovementComponent : public Component
+{
+public:
+    PlayerMovementComponent(Player* player) : m_player(player) {}
+    void update(float dt) override;
+
+private:
+    Player* m_player = nullptr;
 };
 
 class ShowObjectOriginComponent : public Component
@@ -71,4 +83,18 @@ public:
     using AIMoveToComponent::AIMoveToComponent;
 
     void update(float dt) override;
+};
+
+class PlayerAtackComponent : public Component
+{
+public:
+    PlayerAtackComponent(Player* player);
+
+    void update(float dt) override;
+
+    void draw(sf::RenderWindow* window) override;
+
+protected:
+    Player* m_player = nullptr;
+    Projectile* m_sword_slash = nullptr;
 };

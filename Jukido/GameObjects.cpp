@@ -14,6 +14,7 @@ GameObject::GameObject(const char* textureFileName)
 
 	m_texture.loadFromFile(textureFileName);
 	m_sprite.setTexture(m_texture);
+	m_sprite.setOrigin({ float(m_texture.getSize().x), float(m_texture.getSize().y) });
 }
 
 void GameObject::update(float deltaTime)
@@ -21,6 +22,13 @@ void GameObject::update(float deltaTime)
 	for (Component* component : m_components)
 	{
 		component->update(deltaTime);
+	}
+
+	updatePosition(deltaTime);
+
+	if (m_health <= 0)
+	{
+		setPosition({ 0.f, 0.f });
 	}
 }
 
@@ -48,17 +56,29 @@ sf::Vector2f GameObject::getPosition() const
 }
 
 //#TODO, Bohdan: Make it a RestrictByMapComponent so there're objects that are restricted and not by Map Tiles
-void GameObject::updatePosition(const sf::Vector2f& deltaPosition)
+void GameObject::updatePosition(float dt)
 {
 	sf::Vector2f position = getPosition();
-	if (!Map::GetInstance().isTileBlocked({ position.x + deltaPosition.x, position.y }))
+	if (!Map::GetInstance().isTileBlocked({ position.x + m_current_speed.x * dt, position.y }))
 	{
-		position.x += deltaPosition.x;
+		position.x += m_current_speed.x * dt;
 	}
 
-	if (!Map::GetInstance().isTileBlocked({ position.x, position.y + deltaPosition.y }))
+	if (!Map::GetInstance().isTileBlocked({ position.x, position.y + m_current_speed.y * dt }))
 	{
-		position.y += deltaPosition.y;
+		position.y += m_current_speed.y * dt;
+	}
+	else
+	{
+		if (m_current_speed.y > 0)
+		{
+			m_on_the_ground = true;
+		}
+	}
+
+	if (!Map::GetInstance().isTileBlocked({ position.x, position.y + 10 }))
+	{
+		m_on_the_ground = false;
 	}
 
 	setPosition(position);
@@ -132,7 +152,7 @@ void NPC::update(float deltaTime)
 void NPC::floatTo(const sf::Vector2f& direction, float deltaTime)
 {
 	const float MoveDelta = 200.0f * deltaTime;
-	updatePosition({ MoveDelta * direction.x,  MoveDelta * direction.y });
+	//updatePosition({ MoveDelta * direction.x,  MoveDelta * direction.y });
 }
 
 void NPC::setRandomPosition(sf::Vector2u box)

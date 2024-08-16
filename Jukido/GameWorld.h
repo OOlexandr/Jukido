@@ -38,6 +38,8 @@ public:
 	void draw(sf::RenderWindow* window);
 
 	Player& GetPlayer() { return player; }
+	std::vector<GameObject*>& GetCollidableObjects() { return m_collidableObjects; };
+
 
 private:
 	GameWorld(sf::RenderWindow* window);

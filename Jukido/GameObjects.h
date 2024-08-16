@@ -30,10 +30,18 @@ public:
     void setPosition(const sf::Vector2f& position);
     sf::Vector2f getPosition() const;
 
-    void updatePosition(const sf::Vector2f& deltaPosition);
+    void updatePosition(float dt);
 
     sf::Vector2f getSize() const;
     sf::Sprite* getSprite();
+
+    sf::Vector2f getCurrentSpeed() const { return m_current_speed; }
+    void updateSpeedX(float speed_x) { m_current_speed.x = speed_x; }
+    void updateSpeedY(float speed_y) { m_current_speed.y = speed_y; }
+
+    bool isOnTheGround() { return m_on_the_ground; }
+
+    virtual void takeDamage(float damage) { m_health -= damage; }
 
 protected:
     //TODO, Bohdan: Don't load texture every time for the same objects
@@ -42,6 +50,9 @@ protected:
 
 protected:
     std::vector<class Component*> m_components;
+    bool m_on_the_ground = true;
+    sf::Vector2f m_current_speed = { 0.0f, 0.0f };
+    float m_health = 1;
 };
 
 enum class NPC_Behavior

@@ -7,8 +7,7 @@ public:
     Player();
     void update(float deltaTime) override;
 
-private:
-    void handleMovemenent(float deltaTime);
+    float getSpeed() const { return m_speed; }
 
 private:
     float m_speed = 1000.0f;
