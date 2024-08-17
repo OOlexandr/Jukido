@@ -30,12 +30,13 @@ public:
     void setPosition(const sf::Vector2f& position);
     sf::Vector2f getPosition() const;
 
-    void updatePosition(float dt);
+    virtual void updatePosition(float dt);
 
     sf::Vector2f getSize() const;
     sf::Sprite* getSprite();
 
     sf::Vector2f getCurrentSpeed() const { return m_current_speed; }
+    float getSpeed() const { return m_speed; }
     void updateSpeedX(float speed_x) { m_current_speed.x = speed_x; }
     void updateSpeedY(float speed_y) { m_current_speed.y = speed_y; }
 
@@ -52,7 +53,8 @@ protected:
     std::vector<class Component*> m_components;
     bool m_on_the_ground = true;
     sf::Vector2f m_current_speed = { 0.0f, 0.0f };
-    float m_health = 1;
+    float m_speed = 0;
+    float m_health = 0;
 };
 
 enum class NPC_Behavior

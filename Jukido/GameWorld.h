@@ -37,14 +37,14 @@ public:
 	void update(float DeltaTime);
 	void draw(sf::RenderWindow* window);
 
-	Player& GetPlayer() { return player; }
+	Player& GetPlayer() { return m_player; }
 	std::vector<GameObject*>& GetCollidableObjects() { return m_collidableObjects; };
 
 
 private:
 	GameWorld(sf::RenderWindow* window);
 
-	Player player;
+	Player m_player;
 	//CollisionCounter m_collisionCounter;
 
 	std::vector<GameObject*> m_gameObjects;

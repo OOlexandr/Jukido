@@ -1,5 +1,6 @@
 #include "GameObjects.h"
 #include "Component.h"
+#include "Behaviour.h"
 #include "Map.h"
 #include "GameWorld.h"
 
@@ -14,7 +15,7 @@ GameObject::GameObject(const char* textureFileName)
 
 	m_texture.loadFromFile(textureFileName);
 	m_sprite.setTexture(m_texture);
-	m_sprite.setOrigin({ float(m_texture.getSize().x), float(m_texture.getSize().y) });
+	m_sprite.setOrigin({ float(m_texture.getSize().x / 2), float(m_texture.getSize().y / 2) });
 }
 
 void GameObject::update(float deltaTime)
@@ -59,24 +60,46 @@ sf::Vector2f GameObject::getPosition() const
 void GameObject::updatePosition(float dt)
 {
 	sf::Vector2f position = getPosition();
-	if (!Map::GetInstance().isTileBlocked({ position.x + m_current_speed.x * dt, position.y }))
+	if (m_current_speed.x > 0)
 	{
-		position.x += m_current_speed.x * dt;
-	}
-
-	if (!Map::GetInstance().isTileBlocked({ position.x, position.y + m_current_speed.y * dt }))
-	{
-		position.y += m_current_speed.y * dt;
+		if (!Map::GetInstance().isTileBlocked({ position.x + m_current_speed.x * dt + m_sprite.getLocalBounds().width / 2, position.y }))
+		{
+			position.x += m_current_speed.x * dt;
+		}
 	}
 	else
 	{
-		if (m_current_speed.y > 0)
+		if (!Map::GetInstance().isTileBlocked({ position.x + m_current_speed.x * dt - m_sprite.getLocalBounds().width / 2 , position.y }))
 		{
-			m_on_the_ground = true;
+			position.x += m_current_speed.x * dt;
 		}
 	}
 
-	if (!Map::GetInstance().isTileBlocked({ position.x, position.y + 10 }))
+	if (m_current_speed.y > 0)
+	{
+		if (!Map::GetInstance().isTileBlocked({ position.x, position.y + m_current_speed.y * dt + m_sprite.getLocalBounds().height / 2 }))
+		{
+			position.y += m_current_speed.y * dt;
+		}
+		else
+		{
+			m_on_the_ground = true;
+			m_current_speed.y = 0.f;
+		}
+	}
+	else
+	{
+		if (!Map::GetInstance().isTileBlocked({ position.x, position.y + m_current_speed.y * dt - m_sprite.getLocalBounds().height / 2 }))
+		{
+			position.y += m_current_speed.y * dt;
+		}
+		else
+		{
+			m_current_speed.y = 0.f;
+		}
+	}
+
+	if (!Map::GetInstance().isTileBlocked({ position.x, position.y + m_sprite.getLocalBounds().height / 2 + 10}))
 	{
 		m_on_the_ground = false;
 	}
@@ -98,9 +121,8 @@ sf::Sprite* GameObject::getSprite()
 NPC::NPC(const char* filename, NPC_Behavior behavior)
 	: GameObject(filename), m_behavior(behavior)
 {
-	m_sprite.setOrigin(m_sprite.getGlobalBounds().getSize().x / 2,
-		m_sprite.getGlobalBounds().getSize().y / 2);
-
+	m_health = 2;
+	m_speed = 300;
 	setPosition(Map::GetInstance().getRandomValidPosition());
 }
 
@@ -115,6 +137,8 @@ void NPC::PostInit()
 	{
 		m_components.push_back(new AIMoveStraightLineComponent(this, &GameWorld::Instance()->GetPlayer()));
 	}
+	m_components.push_back(new JumpComponent(this));
+	m_components.push_back(new MinionBehavior(this));
 }
 
 void NPC::update(float deltaTime)

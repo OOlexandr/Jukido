@@ -16,17 +16,17 @@ public:
     virtual ~Component() {};
 };
 
-class PlayerJumpComponent : public Component
+class JumpComponent : public Component
 {
 public:
-    PlayerJumpComponent(Player* player);
+    JumpComponent(GameObject* object);
     void update(float dt) override;
 
-    bool jumpRequested();
+    virtual bool jumpRequested() { return false; };
 
-private:
+protected:
 
-    Player* m_player = nullptr;
+    GameObject* m_owner = nullptr;
     sf::Vector2f m_velocity;
 
     bool m_jumpPressedLastFrame = false;
@@ -34,6 +34,14 @@ private:
 
     sf::Sound m_jumpSound;
     sf::SoundBuffer m_buffer;
+};
+
+class PlayerJumpComponent : public JumpComponent
+{
+public:
+    PlayerJumpComponent(GameObject* player) : JumpComponent(player) {};
+
+    bool jumpRequested() override;
 };
 
 class PlayerMovementComponent : public Component
@@ -97,4 +105,5 @@ public:
 protected:
     Player* m_player = nullptr;
     Projectile* m_sword_slash = nullptr;
+    Projectile* m_bullet = nullptr;
 };

@@ -3,21 +3,21 @@
 #include "Player.h"
 #include "MathHelper.h"
 
-PlayerJumpComponent::PlayerJumpComponent(Player* player) : m_player(player)
+JumpComponent::JumpComponent(GameObject* object) : m_owner(object)
 {
     m_buffer.loadFromFile("jump.wav");
     m_jumpSound.setBuffer(m_buffer);
 }
 
 
-void PlayerJumpComponent::update(float dt)
+void JumpComponent::update(float dt)
 {
     //Update velocity
     if (jumpRequested())
     {
         //apply velocity UP
         const float jumpImpulseValue = -1000.0f;
-        m_player->updateSpeedY(jumpImpulseValue);
+        m_owner->updateSpeedY(jumpImpulseValue);
 
         m_jumpSound.play();
     }
@@ -27,14 +27,14 @@ void PlayerJumpComponent::update(float dt)
         const float acceleration = 2000.0f;
         const float terminal_velocity = 2000.0f; // should reach terminal velocity in 1.5 seconds after a jump
         const float delta_velocity = std::min(acceleration * dt, terminal_velocity);
-        const sf::Vector2f velocity = m_player->getCurrentSpeed();
-        if (m_player->isOnTheGround())
+        const sf::Vector2f velocity = m_owner->getCurrentSpeed();
+        if (m_owner->isOnTheGround())
         {
-            m_player->updateSpeedY(std::min(0.0f, velocity.y + delta_velocity));// forbids moving down when on the ground
+            m_owner->updateSpeedY(std::min(0.0f, velocity.y + delta_velocity));// forbids moving down when on the ground
         }
         else
         {
-            m_player->updateSpeedY(velocity.y + delta_velocity);
+            m_owner->updateSpeedY(velocity.y + delta_velocity);
         }
     }
 
@@ -52,7 +52,7 @@ bool PlayerJumpComponent::jumpRequested()
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
     {
         isJumpPressed = true;
-        if (!m_jumpPressedLastFrame && m_player->isOnTheGround())
+        if (!m_jumpPressedLastFrame && m_owner->isOnTheGround())
         {
             requestJump = true;
         }
@@ -122,15 +122,20 @@ void PlayerMovementComponent::update(float dt)
 PlayerAtackComponent::PlayerAtackComponent(Player* player) : m_player(player)
 {
     m_sword_slash = new Slash("HorizontalSlash2.png", player);
+    m_bullet = new Bullet("ball2.png", player);
 }
 
 void PlayerAtackComponent::update(float dt)
 {
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+    if (m_player->isOnTheGround())
     {
-        if (m_player->isOnTheGround())
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
-            m_sword_slash->activate(m_player->getPosition(), 1, (sf::Vector2f(sf::Mouse::getPosition()) - m_player->getPosition()), 0.2);
+            m_sword_slash->activate(1, (sf::Vector2f(sf::Mouse::getPosition()) - m_player->getPosition()), 0.2);
+        }
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
+        {
+            m_bullet->activate(1, (sf::Vector2f(sf::Mouse::getPosition()) - m_player->getPosition()), 0.2);
         }
     }
 
@@ -138,9 +143,20 @@ void PlayerAtackComponent::update(float dt)
     {
         m_sword_slash->update(dt);
     }
+    if (m_bullet->isActive())
+    {
+        m_bullet->update(dt);
+    }
 }
 
 void PlayerAtackComponent::draw(sf::RenderWindow* window)
 {
-    m_sword_slash->draw(window);
+    if (m_sword_slash->isActive())
+    {
+        m_sword_slash->draw(window);
+    }
+    if (m_bullet->isActive())
+    {
+        m_bullet->draw(window);
+    }
 }
