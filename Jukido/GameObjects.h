@@ -18,7 +18,8 @@ enum class VisibilityPriority
 class GameObject
 {
 public:
-    GameObject(const char* textureFileName);
+    GameObject(const sf::Texture* texture);
+    GameObject() {};
 
     virtual void PostInit() {}
     virtual void update(float deltaTime);
@@ -41,11 +42,14 @@ public:
     void updateSpeedY(float speed_y) { m_current_speed.y = speed_y; }
 
     bool isOnTheGround() { return m_on_the_ground; }
+    bool isActive() { return m_active; }
+    virtual void spawn(sf::Vector2f position);
+    virtual void despawn();
 
-    virtual void takeDamage(float damage) { m_health -= damage; }
+    virtual void takeDamage(float damage);
+    float getHealth() { return m_health; }
 
 protected:
-    //TODO, Bohdan: Don't load texture every time for the same objects
     sf::Texture m_texture;
     sf::Sprite m_sprite;
 
@@ -55,39 +59,5 @@ protected:
     sf::Vector2f m_current_speed = { 0.0f, 0.0f };
     float m_speed = 0;
     float m_health = 0;
-};
-
-enum class NPC_Behavior
-{
-    Static,
-    Floating,
-    RandomSnap,
-
-    AI_StraightLine,
-    AI_BestRoute,
-    AI_OptimalRoute,
-
-    Count
-};
-
-
-class NPC : public GameObject
-{
-public:
-    NPC(const char* filename = "BOX.png", NPC_Behavior behavior = NPC_Behavior::Static);
-
-    void PostInit() override;
-    void update(float deltaTime) override;
-    void floatTo(const sf::Vector2f& direction, float deltaTime);
-
-private:
-    void setRandomPosition(sf::Vector2u box);
-
-private:
-    //TODO, Bohdan: Split NPC_Behavior into several sub-classes/components
-    NPC_Behavior m_behavior;
-    sf::Clock m_randomClock;
-    sf::Clock m_floatClock;
-
-    sf::Vector2f m_floatDirection;
+    bool m_active = false;
 };

@@ -2,6 +2,7 @@
 #include "GameObjects.h"
 #include "Player.h"
 #include "MathHelper.h"
+#include "Textures.h"
 
 JumpComponent::JumpComponent(GameObject* object) : m_owner(object)
 {
@@ -78,30 +79,6 @@ void ShowObjectOriginComponent::draw(sf::RenderWindow* window)
     window->draw(m_circle);
 }
 
-
-
-void AIMoveStraightLineComponent::update(float dt)
-{
-    moveTo(dt, m_targetObject->getPosition());
-}
-
-AIMoveToComponent::AIMoveToComponent(GameObject* referenceObject, GameObject* targetObject)
-    : m_referenceObject(referenceObject), m_targetObject(targetObject)
-{
-}
-
-void AIMoveToComponent::moveTo(float dt, const sf::Vector2f& position)
-{
-    const float DeltaSpeed = dt * m_speed;
-
-    const sf::Vector2f Direction = position - m_referenceObject->getPosition();
-    if (MathHelper::GetLength(Direction) > m_minimalDistance)
-    {
-        const sf::Vector2f NormalizedDirection = MathHelper::Normalize(Direction);
-        //m_referenceObject->updatePosition({ NormalizedDirection.x * DeltaSpeed, NormalizedDirection.y * DeltaSpeed });
-    }
-}
-
 void PlayerMovementComponent::update(float dt)
 {
     const float MoveDelta = m_player->getSpeed();
@@ -121,8 +98,8 @@ void PlayerMovementComponent::update(float dt)
 
 PlayerAtackComponent::PlayerAtackComponent(Player* player) : m_player(player)
 {
-    m_sword_slash = new Slash("HorizontalSlash2.png", player);
-    m_bullet = new Bullet("ball2.png", player);
+    m_sword_slash = new Slash(Textures::Instance()->getTexture("slash_player"), player);
+    m_bullet = new Bullet(Textures::Instance()->getTexture("bullet"), player);
 }
 
 void PlayerAtackComponent::update(float dt)

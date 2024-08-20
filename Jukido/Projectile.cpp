@@ -3,7 +3,7 @@
 #include "GameWorld.h"
 #include "MathHelper.h"
 
-Projectile::Projectile(const char* textureFileName, const GameObject* owner) : GameObject(textureFileName), m_owner(owner)
+Projectile::Projectile(sf::Texture* texture, const GameObject* owner) : GameObject(texture), m_owner(owner)
 {
 	m_health = 1;
 }
@@ -41,13 +41,19 @@ void Projectile::deactivate()
 	m_active = false;
 }
 
-Slash::Slash(const char* textureFileName, const GameObject* owner) : Projectile(textureFileName, owner)
+void Projectile::despawn()
+{
+	deactivate();
+}
+
+Slash::Slash(sf::Texture* texture, const GameObject* owner) : Projectile(texture, owner)
 {
 	m_sprite.setOrigin(0, m_sprite.getGlobalBounds().getSize().y / 2);
 }
 
 void Slash::activate(float damage, sf::Vector2f direction, float longevity)
 {
+	m_hit_targets.clear();
 	Projectile::activate(damage, direction, longevity);
 	if (direction.x > 0)
 	{
@@ -64,6 +70,7 @@ void Slash::update(float deltaTime)
 	Projectile::update(deltaTime);
 
 	std::vector<GameObject*> targets = GameWorld::Instance()->GetCollidableObjects();
+
 	for (GameObject* t : targets)
 	{
 		if (!(t == m_owner))
@@ -71,9 +78,10 @@ void Slash::update(float deltaTime)
 			sf::FloatRect slash = m_sprite.getGlobalBounds();
 			sf::FloatRect target = t->getSprite()->getGlobalBounds();
 
-			if (slash.intersects(target))
+			if (slash.intersects(target) && !(std::find(m_hit_targets.begin(), m_hit_targets.end(), t) != m_hit_targets.end()))
 			{
 				t->takeDamage(m_damage);
+				m_hit_targets.push_back(t);
 			}
 		}
 	}

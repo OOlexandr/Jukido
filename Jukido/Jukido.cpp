@@ -5,10 +5,10 @@
 #include "GameStateManager.h"
 #include "WindowHelper.h"
 #include "GameWorld.h"
+#include "Textures.h"
 
 void handleSystemEvents(sf::RenderWindow& window)
 {
-
     sf::Event event;
     while (window.pollEvent(event))
     {
@@ -32,6 +32,8 @@ int main()
 
     sf::RenderWindow& window = WindowHelper::Instance().GetRenderWindow();
 
+    Textures::createInstance();
+
     GameWorld::createInstance(&window);
     GameWorld::Instance()->PostInit();
 
@@ -54,6 +56,7 @@ int main()
     }
 
     GameWorld::destroyInstance();
+    Textures::destroyInstance();
 
     return 0;
 }

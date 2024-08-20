@@ -1,6 +1,8 @@
 #include "Behaviour.h"
 #include "GameWorld.h"
 #include "MathHelper.h"
+#include "Enemies.h"
+#include "Textures.h"
 
 sf::Vector2f Behavior::getVectorToPlayer()
 {
@@ -48,9 +50,15 @@ void Behavior::lock(float time)
 	m_cooldown = time;
 }
 
+void Behavior::despawn()
+{
+	m_locked = false;
+	m_cooldown = 0;
+}
+
 MinionBehavior::MinionBehavior(GameObject* owner) : Behavior(owner)
 {
-	m_slash = new Slash("RedSlash2.png", m_owner);
+	m_slash = new Slash(Textures::Instance()->getTexture("slash_enemy"), m_owner);
 	m_projectiles.push_back(m_slash);
 }
 
@@ -88,5 +96,42 @@ void MinionBehavior::decision()
 	{
 		m_requested_atack = true;
 		lock(0.2);
+	}
+}
+
+BossBehavior::BossBehavior(GameObject* owner, const std::vector<Minion*>& minions, std::vector<sf::Vector2f> spawn_points) : Behavior(owner)
+{
+	m_minions = minions;
+	m_spawn_points = spawn_points;
+}
+
+void BossBehavior::decision()
+{
+	if (!getNumberOfActiveMinions())
+	{
+		spawnMinions();
+	}
+}
+
+int BossBehavior::getNumberOfActiveMinions()
+{
+	int num = 0;
+	for (Minion* m : m_minions)
+	{
+		if (m->isActive())
+		{
+			num++;
+		}
+	}
+	return num;
+}
+
+void BossBehavior::spawnMinions()
+{
+	// Now the length of m_minions and m_spawn_points is the same.
+	// will fix this if have enough time.
+	for (size_t i = 0; i < m_minions.size(); i++)
+	{
+		m_minions[i]->spawn(m_spawn_points[i]);
 	}
 }

@@ -4,6 +4,7 @@
 #include "GameObjects.h"
 //#include "CollisionCounter.h"
 #include "Player.h"
+#include "Enemies.h"
 #include "assert.h"
 
 #define TESTING_MULTITHREAD
@@ -31,27 +32,34 @@ public:
 
 	~GameWorld();
 
-	void blur();
-	void unblur();
-
 	void update(float DeltaTime);
 	void draw(sf::RenderWindow* window);
 
-	Player& GetPlayer() { return m_player; }
+	Player& GetPlayer() { return *m_player; }
 	std::vector<GameObject*>& GetCollidableObjects() { return m_collidableObjects; };
 
 
 private:
 	GameWorld(sf::RenderWindow* window);
 
-	Player m_player;
-	//CollisionCounter m_collisionCounter;
+	void startGame();
+	void EndGame();
 
-	std::vector<GameObject*> m_gameObjects;
-	std::vector<GameObject*> m_collidableObjects;
+	Player* m_player;
+	Boss* m_boss;
+
+	//CollisionCounter m_collisionCounter;
+	sf::Font m_font;
+	sf::Text m_victory, m_loss, m_restart;
+
+	std::vector<GameObject*> m_gameObjects = {};
+	std::vector<GameObject*> m_collidableObjects = {};
 
 	bool m_blurred = false;
 	sf::RectangleShape m_rectangle;
 
 	static GameWorld* ms_gameWorld;
+
+	bool m_active = false;
+	bool m_won = false;
 };

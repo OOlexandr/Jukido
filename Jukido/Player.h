@@ -4,6 +4,7 @@
 class Player : public GameObject
 {
 public:
-    Player();
+    Player(sf::Texture* texture) : GameObject(texture) {}
+    void PostInit() override;
     void update(float deltaTime) override;
 };

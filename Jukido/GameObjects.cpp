@@ -7,13 +7,12 @@
 //Enable if needed
 //#define NPC_DEBUG_POSITION
 
-GameObject::GameObject(const char* textureFileName)
+GameObject::GameObject(const sf::Texture* texture)
 {
 	//#TODO, Bohdan: There must be as little texture loaded as possible
 	//So GameObject should reuse the same texture but not load it 
 	//several times
-
-	m_texture.loadFromFile(textureFileName);
+	m_texture = *texture;
 	m_sprite.setTexture(m_texture);
 	m_sprite.setOrigin({ float(m_texture.getSize().x / 2), float(m_texture.getSize().y / 2) });
 }
@@ -26,11 +25,6 @@ void GameObject::update(float deltaTime)
 	}
 
 	updatePosition(deltaTime);
-
-	if (m_health <= 0)
-	{
-		setPosition({ 0.f, 0.f });
-	}
 }
 
 void GameObject::draw(sf::RenderWindow* window)
@@ -117,70 +111,27 @@ sf::Sprite* GameObject::getSprite()
 	return &m_sprite;
 }
 
-
-NPC::NPC(const char* filename, NPC_Behavior behavior)
-	: GameObject(filename), m_behavior(behavior)
+void GameObject::spawn(sf::Vector2f position)
 {
-	m_health = 2;
-	m_speed = 300;
-	setPosition(Map::GetInstance().getRandomValidPosition());
+	m_active = true;
+	setPosition(position);
 }
 
-
-void NPC::PostInit()
+void GameObject::despawn()
 {
-#ifdef NPC_DEBUG_POSITION
-	m_components.push_back(new ShowObjectOriginComponent(this));
-#endif 
-
-	if (m_behavior == NPC_Behavior::AI_StraightLine)
+	m_active = false;
+	setPosition({ 0.f,0.f });
+	for (Component* c : m_components)
 	{
-		m_components.push_back(new AIMoveStraightLineComponent(this, &GameWorld::Instance()->GetPlayer()));
+		c->despawn();
 	}
-	m_components.push_back(new JumpComponent(this));
-	m_components.push_back(new MinionBehavior(this));
 }
 
-void NPC::update(float deltaTime)
+void GameObject::takeDamage(float damage)
 {
-	GameObject::update(deltaTime);
-
-	if (m_behavior == NPC_Behavior::Floating)
+	m_health -= damage;
+	if (m_health <= 0)
 	{
-		if (m_floatClock.getElapsedTime().asSeconds() > 1)
-		{
-			m_floatDirection.x = std::rand() % 3 - 1;   //-1 0 1
-			m_floatDirection.y = std::rand() % 3 - 1;   //-1 0 1
-
-			m_floatClock.restart();
-		}
-		floatTo(m_floatDirection, deltaTime);
-
+		despawn();
 	}
-	else if (m_behavior == NPC_Behavior::RandomSnap)
-	{
-		//update NPC position every second
-		if (m_randomClock.getElapsedTime().asSeconds() > 1)
-		{
-			setRandomPosition({ static_cast<sf::Uint32>(WindowHelper::Instance().GetRenderWindow().getSize().x)
-				, static_cast<sf::Uint32>(WindowHelper::Instance().GetRenderWindow().getSize().y) });
-
-			setPosition(Map::GetInstance().getRandomValidPosition());
-
-			m_randomClock.restart();
-		}
-	}
-	else if (m_behavior == NPC_Behavior::Static) {}
-}
-
-void NPC::floatTo(const sf::Vector2f& direction, float deltaTime)
-{
-	const float MoveDelta = 200.0f * deltaTime;
-	//updatePosition({ MoveDelta * direction.x,  MoveDelta * direction.y });
-}
-
-void NPC::setRandomPosition(sf::Vector2u box)
-{
-	m_sprite.setPosition({ static_cast<float>(std::rand() % (box.x - static_cast<unsigned int>(m_sprite.getGlobalBounds().getSize().x))),
-	static_cast<float>(std::rand() % (box.y - static_cast<unsigned int>(m_sprite.getGlobalBounds().getSize().y))) });
 }

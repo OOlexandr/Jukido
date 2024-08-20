@@ -1,27 +1,74 @@
 #include "GameWorld.h"
+#include "iostream"
 
 #include "GameObjects.h"
+#include "Enemies.h"
 #include "Map.h"
+#include "Textures.h"
 
 GameWorld* GameWorld::ms_gameWorld = nullptr;
 
 GameWorld::GameWorld(sf::RenderWindow* window)
 {
-    NPC* npc1 = new NPC("stone.png", NPC_Behavior::AI_BestRoute); //center of the game window
-    NPC* npc2 = new NPC("stone.png", NPC_Behavior::AI_BestRoute); //center of the game window
-    NPC* npc3 = new NPC("stone.png", NPC_Behavior::AI_BestRoute); //center of the game window
+    m_font.loadFromFile("arial.ttf");
+    
+    Textures* textures = Textures::Instance();
+    Map map = Map::GetInstance();
+    Minion* minion1 = new Minion(textures->getTexture("minion"));
+    Minion* minion2 = new Minion(textures->getTexture("minion"));
+    std::vector<Minion*> minions = { minion1, minion2 };
+    std::vector<sf::Vector2f> spawns = { map.getPositionFromTile({0,7}), map.getPositionFromTile({16,7})};
+    m_boss = new Boss(minions, spawns, textures->getTexture("boss"));
+    m_player = new Player(textures->getTexture("player"));
 
+    m_gameObjects.push_back(m_player);
+    m_gameObjects.push_back(minion1);
+    m_gameObjects.push_back(minion2);
+    m_gameObjects.push_back(m_boss);
 
+    m_collidableObjects.push_back(m_player);
+    m_collidableObjects.push_back(minion1);
+    m_collidableObjects.push_back(minion2);
+    m_collidableObjects.push_back(m_boss);
 
-    m_gameObjects.push_back(&m_player);
-    m_gameObjects.push_back(npc1);
-    m_gameObjects.push_back(npc2);
-    m_gameObjects.push_back(npc3);
+    m_victory.setFont(m_font);
+    m_victory.setString("Victory achieved");
+    m_victory.setStyle(sf::Text::Bold | sf::Text::Underlined);
+    m_victory.setCharacterSize(60);
+    m_victory.setPosition(map.getPositionFromTile({ 8, 4 }));
+    m_victory.setFillColor(sf::Color::Black);
 
-    m_collidableObjects.push_back(npc1);
-    m_collidableObjects.push_back(npc2);
-    m_collidableObjects.push_back(npc3);
-    m_collidableObjects.push_back(&m_player);
+    m_loss.setFont(m_font);
+    m_loss.setString("You died");
+    m_loss.setStyle(sf::Text::Bold | sf::Text::Underlined);
+    m_loss.setCharacterSize(60);
+    m_loss.setPosition(map.getPositionFromTile({ 8, 4 }));
+    m_loss.setFillColor(sf::Color::Black);
+
+    m_restart.setFont(m_font);
+    m_restart.setString("Press 'R' to restart or 'Esc' to exit");
+    m_restart.setCharacterSize(24);
+    m_restart.setPosition(map.getPositionFromTile({ 8, 5 }));
+    m_restart.setFillColor(sf::Color::Black);
+
+    startGame();
+}
+
+void GameWorld::startGame()
+{
+    Map map = Map::GetInstance();
+    m_active = true;
+    m_won = 0;
+    m_boss->spawn(map.getPositionFromTile({ 16,1 }));
+    m_player->spawn(map.getPositionFromTile({ 2,7 }));
+}
+
+void GameWorld::EndGame()
+{
+    for (auto gameObject : m_gameObjects)
+    {
+        gameObject->despawn();
+    }
 }
 
 void GameWorld::PostInit()
@@ -34,7 +81,10 @@ void GameWorld::PostInit()
 
 GameWorld::~GameWorld()
 {
-    //TODO, Bohdan: Delete memory used
+    for (auto gameObject : m_gameObjects)
+    {
+        delete gameObject;
+    }
 }
 
 
@@ -53,9 +103,32 @@ bool checkCollision(const sf::Sprite* sprite1, const sf::Sprite* sprite2)
 void GameWorld::update(float DeltaTime)
 {
     //Update all game objects
-    for (size_t i = 0; i < m_gameObjects.size(); i++)
+    if (m_active)
     {
-        m_gameObjects[i]->update(DeltaTime);
+        for (size_t i = 0; i < m_gameObjects.size(); i++)
+        {
+            if (m_gameObjects[i]->isActive())
+                m_gameObjects[i]->update(DeltaTime);
+        }
+        if (!m_player->isActive())
+        {
+            m_active = false;
+            m_won = false;
+            EndGame();
+        }
+        else if (!m_boss->isActive())
+        {
+            m_active = false;
+            m_won = true;
+            EndGame();
+        }
+    }
+    else
+    {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R))
+        {
+            startGame();
+        }
     }
 }
 
@@ -65,6 +138,19 @@ void GameWorld::draw(sf::RenderWindow* window)
 
     for (GameObject* object : m_gameObjects)
     {
-        object->draw(window);
+        if (object->isActive())
+            object->draw(window);
+    }
+    if (!m_active)
+    {
+        if (m_won)
+        {
+            window->draw(m_victory);
+        }
+        else
+        {
+            window->draw(m_loss);
+        }
+        window->draw(m_restart);
     }
 }
