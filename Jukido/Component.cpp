@@ -214,7 +214,7 @@ void PlayerAtackComponent::atackSword()
 {
     if (m_combo <= m_slashes.size())
     {
-        if (m_combo == 1)
+        if (m_combo == 3)
         {
             m_slashes[m_combo - 1]->activate(2, (sf::Vector2f(sf::Mouse::getPosition()) - m_player->getPosition()), 0.3);
         }
