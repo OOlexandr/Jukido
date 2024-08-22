@@ -7,7 +7,7 @@ Textures::Textures()
 	sf::Texture minion, player, boss, bullet, cannonball, target, slash_player0, slash_player1, slash_player2, slash_enemy;
 	minion.loadFromFile("BOX.png");
 	boss.loadFromFile("stone.png");
-	player.loadFromFile("MINECRAFT_SPRITE.png");
+	player.loadFromFile("player.png");
 	bullet.loadFromFile("ball2.png");
 	cannonball.loadFromFile("ball.png");
 	target.loadFromFile("target.png");

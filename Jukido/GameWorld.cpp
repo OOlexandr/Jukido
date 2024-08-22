@@ -143,7 +143,7 @@ void GameWorld::update(float DeltaTime)
     }
     else
     {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::T))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R))
         {
             startGame();
         }
