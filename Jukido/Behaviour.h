@@ -36,6 +36,7 @@ public:
 
 protected:
 	Slash* m_slash = nullptr;
+	sf::Sound m_slash_sound;
 };
 
 class BossBehavior : public Behavior
@@ -54,4 +55,6 @@ protected:
 	std::vector<sf::Vector2f> m_cannon_points;
 	CannonBall* m_cannonball1 = nullptr;
 	CannonBall* m_cannonball2 = nullptr;
+
+	sf::Sound m_cannon_sound;
 };

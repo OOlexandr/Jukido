@@ -9,9 +9,6 @@
 
 GameObject::GameObject(const sf::Texture* texture)
 {
-	//#TODO, Bohdan: There must be as little texture loaded as possible
-	//So GameObject should reuse the same texture but not load it 
-	//several times
 	m_texture = *texture;
 	m_sprite.setTexture(m_texture);
 	m_sprite.setOrigin({ float(m_texture.getSize().x / 2), float(m_texture.getSize().y / 2) });

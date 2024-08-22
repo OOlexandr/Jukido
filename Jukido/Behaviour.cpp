@@ -3,6 +3,7 @@
 #include "MathHelper.h"
 #include "Enemies.h"
 #include "Textures.h"
+#include "Sounds.h"
 
 Behavior::~Behavior()
 {
@@ -72,6 +73,7 @@ MinionBehavior::MinionBehavior(GameObject* owner) : Behavior(owner)
 {
 	m_slash = new Slash(Textures::Instance()->getTexture("slash_enemy"), m_owner);
 	m_projectiles.push_back(m_slash);
+	m_slash_sound.setBuffer(*Sounds::Instance()->getSound("slash"));
 }
 
 void MinionBehavior::move()
@@ -90,6 +92,7 @@ void MinionBehavior::move()
 void MinionBehavior::atack(float damage = 1, float cooldown = 0.2)
 {
 	m_slash->activate(damage, getVectorToPlayer(), cooldown);
+	m_slash_sound.play();
 }
 
 void MinionBehavior::decision()
@@ -121,6 +124,7 @@ BossBehavior::BossBehavior(GameObject* owner, const std::vector<Minion*>& minion
 	m_cannonball2 = new CannonBall(Textures::Instance()->getTexture("cannonball"), Textures::Instance()->getTexture("target"), m_owner);
 	m_projectiles.push_back(m_cannonball1);
 	m_projectiles.push_back(m_cannonball2);
+	m_cannon_sound.setBuffer(*Sounds::Instance()->getSound("cannon"));
 }
 
 void BossBehavior::decision()
@@ -169,4 +173,6 @@ void BossBehavior::fireCannons()
 
 	m_cannonball1->activate(1, cannon1, 2);
 	m_cannonball2->activate(1, cannon2, 2);
+
+	m_cannon_sound.play();
 }

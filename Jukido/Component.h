@@ -31,10 +31,6 @@ protected:
     sf::Vector2f m_velocity;
 
     bool m_jumpPressedLastFrame = false;
-
-
-    sf::Sound m_jumpSound;
-    sf::SoundBuffer m_buffer;
 };
 
 class PlayerJumpComponent : public JumpComponent
@@ -86,6 +82,8 @@ protected:
     Player* m_player = nullptr;
     std::vector<Projectile*> m_bullets;
     std::vector<Projectile*> m_slashes;
+
+    sf::Sound m_slash, m_shot;
 
     bool m_atackPressedLastFrame = false;
     bool m_requested_atack = false;

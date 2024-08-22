@@ -3,13 +3,11 @@
 #include "Player.h"
 #include "MathHelper.h"
 #include "Textures.h"
+#include "Sounds.h"
 
 JumpComponent::JumpComponent(GameObject* object) : m_owner(object)
 {
-    m_buffer.loadFromFile("jump.wav");
-    m_jumpSound.setBuffer(m_buffer);
 }
-
 
 void JumpComponent::update(float dt)
 {
@@ -19,8 +17,6 @@ void JumpComponent::update(float dt)
         //apply velocity UP
         const float jumpImpulseValue = -1000.0f;
         m_owner->updateSpeedY(jumpImpulseValue);
-
-        m_jumpSound.play();
     }
     else
     {
@@ -105,6 +101,9 @@ PlayerAtackComponent::PlayerAtackComponent(Player* player) : m_player(player)
     m_slashes.push_back(new Slash(Textures::Instance()->getTexture("slash_player0"), player));
     m_slashes.push_back(new Slash(Textures::Instance()->getTexture("slash_player1"), player));
     m_slashes.push_back(new Slash(Textures::Instance()->getTexture("slash_player2"), player));
+
+    m_shot.setBuffer(*Sounds::Instance()->getSound("shoot"));
+    m_slash.setBuffer(*Sounds::Instance()->getSound("slash"));
 }
 
 PlayerAtackComponent::~PlayerAtackComponent()
@@ -222,6 +221,7 @@ void PlayerAtackComponent::atackSword()
         {
             m_slashes[m_combo - 1]->activate(1, (sf::Vector2f(sf::Mouse::getPosition()) - m_player->getPosition()), 0.3);
         }
+        m_slash.play();
     }
     else
     {
@@ -236,6 +236,7 @@ void PlayerAtackComponent::fire()
         if (!p->isActive())
         {
             p->activate(1, (sf::Vector2f(sf::Mouse::getPosition()) - m_player->getPosition()), 0.4);
+            m_shot.play();
             break;
         }
     }

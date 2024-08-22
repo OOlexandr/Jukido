@@ -6,6 +6,7 @@
 #include "WindowHelper.h"
 #include "GameWorld.h"
 #include "Textures.h"
+#include "Sounds.h"
 
 void handleSystemEvents(sf::RenderWindow& window)
 {
@@ -33,6 +34,7 @@ int main()
     sf::RenderWindow& window = WindowHelper::Instance().GetRenderWindow();
 
     Textures::createInstance();
+    Sounds::createInstance();
 
     GameWorld::createInstance(&window);
     GameWorld::Instance()->PostInit();
@@ -57,6 +59,7 @@ int main()
 
     GameWorld::destroyInstance();
     Textures::destroyInstance();
+    Sounds::destroyInstance();
 
     return 0;
 }
