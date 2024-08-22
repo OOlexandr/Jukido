@@ -4,9 +4,9 @@
 class Projectile : public GameObject
 {
 public:
-	Projectile(sf::Texture* texture, const GameObject* owner);
+	Projectile(sf::Texture* texture, GameObject* owner);
 	void update(float deltaTime) override;
-	void DealDamage(GameObject* target);
+	virtual void DealDamage(GameObject* target);
 	virtual void activate(float damage, sf::Vector2f direction, float longevity);
 	void deactivate();
 	void despawn() override;
@@ -15,17 +15,19 @@ protected:
 	float m_damage = 0;
 	float m_time_alive = 0;
 	float m_longevity = 0;
-	const GameObject* m_owner = nullptr; // to avoid self damage
+	GameObject* m_owner = nullptr; // to avoid self damage
 };
 
 class Slash : public Projectile
 {
 public:
-	Slash(sf::Texture* texture, const GameObject* owner);
+	Slash(sf::Texture* texture, GameObject* owner);
 
 	void activate(float damage, sf::Vector2f direction, float longevity);
 
 	void update(float deltaTime) override;
+
+	void DealDamage(GameObject* target) override;
 
 private:
 	std::vector<GameObject*> m_hit_targets;
@@ -34,7 +36,7 @@ private:
 class Bullet : public Projectile
 {
 public:
-	Bullet(sf::Texture* texture, const GameObject* owner) : Projectile(texture, owner) {}
+	Bullet(sf::Texture* texture, GameObject* owner) : Projectile(texture, owner) {}
 
 	void updatePosition(float dt) override;
 

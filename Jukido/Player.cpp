@@ -17,3 +17,10 @@ void Player::update(float deltaTime)
 {
 	GameObject::update(deltaTime);
 }
+
+void Player::spawn(sf::Vector2f position)
+{
+	GameObject::spawn(position);
+	m_n_bullets = 0;
+	m_health = 3;
+}

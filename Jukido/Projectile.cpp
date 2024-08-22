@@ -3,7 +3,7 @@
 #include "GameWorld.h"
 #include "MathHelper.h"
 
-Projectile::Projectile(sf::Texture* texture, const GameObject* owner) : GameObject(texture), m_owner(owner)
+Projectile::Projectile(sf::Texture* texture, GameObject* owner) : GameObject(texture), m_owner(owner)
 {
 	m_health = 1;
 }
@@ -46,7 +46,7 @@ void Projectile::despawn()
 	deactivate();
 }
 
-Slash::Slash(sf::Texture* texture, const GameObject* owner) : Projectile(texture, owner)
+Slash::Slash(sf::Texture* texture, GameObject* owner) : Projectile(texture, owner)
 {
 	m_sprite.setOrigin(0, m_sprite.getGlobalBounds().getSize().y / 2);
 }
@@ -80,11 +80,17 @@ void Slash::update(float deltaTime)
 
 			if (slash.intersects(target) && !(std::find(m_hit_targets.begin(), m_hit_targets.end(), t) != m_hit_targets.end()))
 			{
-				t->takeDamage(m_damage);
+				DealDamage(t);
 				m_hit_targets.push_back(t);
 			}
 		}
 	}
+}
+
+void Slash::DealDamage(GameObject* target)
+{
+	Projectile::DealDamage(target);
+	m_owner->addRounds(m_damage);
 }
 
 void Bullet::updatePosition(float dt)
@@ -131,12 +137,12 @@ void Bullet::update(float deltaTime)
 	{
 		if (!(t == m_owner))
 		{
-			sf::FloatRect slash = m_sprite.getGlobalBounds();
+			sf::FloatRect bullet = m_sprite.getGlobalBounds();
 			sf::FloatRect target = t->getSprite()->getGlobalBounds();
 
-			if (slash.intersects(target))
+			if (bullet.intersects(target))
 			{
-				t->takeDamage(m_damage);
+				DealDamage(t);
 				deactivate();
 				break;
 			}

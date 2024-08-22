@@ -49,6 +49,8 @@ public:
     virtual void takeDamage(float damage);
     float getHealth() { return m_health; }
 
+    virtual void addRounds(float add) {}
+
 protected:
     sf::Texture m_texture;
     sf::Sprite m_sprite;

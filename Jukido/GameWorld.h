@@ -51,6 +51,7 @@ private:
 	//CollisionCounter m_collisionCounter;
 	sf::Font m_font;
 	sf::Text m_victory, m_loss, m_restart;
+	sf::Text m_health, m_rounds;
 
 	std::vector<GameObject*> m_gameObjects = {};
 	std::vector<GameObject*> m_collidableObjects = {};

@@ -51,6 +51,19 @@ GameWorld::GameWorld(sf::RenderWindow* window)
     m_restart.setPosition(map.getPositionFromTile({ 8, 5 }));
     m_restart.setFillColor(sf::Color::Black);
 
+    m_rounds.setFont(m_font);
+    m_rounds.setString("");
+    m_rounds.setCharacterSize(24);
+    m_rounds.setPosition(map.getPositionFromTile({ 0, 7 }));
+    m_rounds.setFillColor(sf::Color::Black);
+
+    
+    m_health.setFont(m_font);
+    m_health.setCharacterSize(24);
+    m_health.setPosition(map.getPositionFromTile({ 0, 0 }));
+    m_health.setFillColor(sf::Color::Black);
+    
+
     startGame();
 }
 
@@ -122,10 +135,13 @@ void GameWorld::update(float DeltaTime)
             m_won = true;
             EndGame();
         }
+        
+        m_rounds.setString(std::to_string(m_player->getRounds()));
+        m_health.setString(std::to_string(int(m_player->getHealth())));
     }
     else
     {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::T))
         {
             startGame();
         }
@@ -139,7 +155,11 @@ void GameWorld::draw(sf::RenderWindow* window)
     for (GameObject* object : m_gameObjects)
     {
         if (object->isActive())
+        {
             object->draw(window);
+            window->draw(m_rounds);
+            window->draw(m_health);
+        }
     }
     if (!m_active)
     {

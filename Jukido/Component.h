@@ -68,43 +68,29 @@ private:
     sf::CircleShape m_circle;
 };
 
-class AIMoveToComponent : public Component
-{
-    // will be repurposed. Probably npcs will just move towards player.
-public:
-    AIMoveToComponent(GameObject* referenceObject, GameObject* targetObject);
-
-protected:
-    void moveTo(float dt, const sf::Vector2f& position);
-
-protected:
-    GameObject* m_referenceObject = nullptr;
-    GameObject* m_targetObject = nullptr;
-
-    unsigned m_speed = 400.0f;
-    unsigned m_minimalDistance = 20.0f;
-};
-
-class AIMoveStraightLineComponent : public AIMoveToComponent
-{
-    //Most likely useless
-public:
-    using AIMoveToComponent::AIMoveToComponent;
-
-    void update(float dt) override;
-};
-
 class PlayerAtackComponent : public Component
 {
 public:
     PlayerAtackComponent(Player* player);
+    ~PlayerAtackComponent();
 
     void update(float dt) override;
 
     void draw(sf::RenderWindow* window) override;
 
 protected:
+    void atackSword();
+
+    void fire();
+
     Player* m_player = nullptr;
-    Projectile* m_sword_slash = nullptr;
-    Projectile* m_bullet = nullptr;
+    std::vector<Projectile*> m_bullets;
+    std::vector<Projectile*> m_slashes;
+
+    bool m_atackPressedLastFrame = false;
+    bool m_requested_atack = false;
+    bool m_shootPressedLastFrame = false;
+    bool m_requested_shoot = false;
+    int m_combo = 0;
+    float m_cooldown = 0;
 };

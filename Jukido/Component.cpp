@@ -98,42 +98,138 @@ void PlayerMovementComponent::update(float dt)
 
 PlayerAtackComponent::PlayerAtackComponent(Player* player) : m_player(player)
 {
-    m_sword_slash = new Slash(Textures::Instance()->getTexture("slash_player"), player);
-    m_bullet = new Bullet(Textures::Instance()->getTexture("bullet"), player);
+    for (size_t i = 0; i < 6; i++)
+    {
+        m_bullets.push_back(new Bullet(Textures::Instance()->getTexture("bullet"), player));
+    }
+    m_slashes.push_back(new Slash(Textures::Instance()->getTexture("slash_player0"), player));
+    m_slashes.push_back(new Slash(Textures::Instance()->getTexture("slash_player1"), player));
+    m_slashes.push_back(new Slash(Textures::Instance()->getTexture("slash_player2"), player));
+}
+
+PlayerAtackComponent::~PlayerAtackComponent()
+{
+    for (Projectile* p : m_slashes)
+    {
+        delete p;
+    }
+    for (Projectile* p : m_bullets)
+    {
+        delete p;
+    }
 }
 
 void PlayerAtackComponent::update(float dt)
 {
+    m_cooldown = std::max(m_cooldown - dt, 0.f);
+
     if (m_player->isOnTheGround())
     {
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
-            m_sword_slash->activate(1, (sf::Vector2f(sf::Mouse::getPosition()) - m_player->getPosition()), 0.2);
+            if (!m_atackPressedLastFrame && !m_requested_atack)
+            {
+                m_requested_atack = true;
+                m_combo += 1;
+            }
+            
+            m_atackPressedLastFrame = true;
         }
+        else
+        {
+            m_atackPressedLastFrame = false;
+        }
+
+        if (m_requested_atack && m_cooldown <= 0.0f)
+        {
+            m_requested_atack = false;
+            m_cooldown = 0.3f;
+            atackSword();
+        }
+
         if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
         {
-            m_bullet->activate(1, (sf::Vector2f(sf::Mouse::getPosition()) - m_player->getPosition()), 0.2);
+            if (!m_shootPressedLastFrame && m_player->getRounds() >= 1)
+            {
+                m_requested_shoot = true;
+            }
+            m_shootPressedLastFrame = true;
+        }
+        else
+        {
+            m_shootPressedLastFrame = false;
+        }
+
+        if (m_requested_shoot && m_cooldown <= 0.0f)
+        {
+            m_requested_shoot = false;
+            fire();
+            m_player->decreaseRounds();
+            // no cooldown on firing.
+            // The limit to firearm's dps is not fire rate but capacity.
+            // But shooting in the middle of a slash is not allowed.
         }
     }
 
-    if (m_sword_slash->isActive())
+    if (m_cooldown <= 0)
     {
-        m_sword_slash->update(dt);
+        m_combo = 0;
     }
-    if (m_bullet->isActive())
+
+    for (Projectile* p : m_slashes)
     {
-        m_bullet->update(dt);
+        if (p->isActive())
+        {
+            p->update(dt);
+        }
+    }
+    for (Projectile* p : m_bullets)
+    {
+        if (p->isActive())
+        {
+            p->update(dt);
+        }
     }
 }
 
 void PlayerAtackComponent::draw(sf::RenderWindow* window)
 {
-    if (m_sword_slash->isActive())
+    for (Projectile* p : m_slashes)
     {
-        m_sword_slash->draw(window);
+        if (p->isActive())
+        {
+            p->draw(window);
+        }
     }
-    if (m_bullet->isActive())
+    for (Projectile* p : m_bullets)
     {
-        m_bullet->draw(window);
+        if (p->isActive())
+        {
+            p->draw(window);
+        }
+    }
+}
+
+void PlayerAtackComponent::atackSword()
+{
+    if (m_combo <= m_slashes.size())
+    {
+        m_slashes[m_combo-1]->activate(1, (sf::Vector2f(sf::Mouse::getPosition()) - m_player->getPosition()), 0.3);
+    }
+    else
+    {
+        m_combo = 0;
+    }
+}
+
+void PlayerAtackComponent::fire()
+{
+    for (Projectile* p : m_bullets)
+    {
+        if (!p->isActive())
+        {
+            p->activate(1, (sf::Vector2f(sf::Mouse::getPosition()) - m_player->getPosition()), 0.4);
+            break;
+        }
     }
 }
