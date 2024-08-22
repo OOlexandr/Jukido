@@ -21,6 +21,5 @@ If player presses right mouse button Juki draws his revolver and fires towards c
 The revolver can only hold six rounds and Juki has to deal damage with katana to replenish them.
 
 At the moment the game has a single bossfight with the pirate captain because pirates are as close to being polar opposites to samurai as possible. And his minions - humanoid sharks because I am running out of time to find good textures.
-(Note: at the moment of writing I haven't found textures for the ship. I am no artist and I remembered it a week deep. If the note is still here it means that I did not find it.)
 The captain stands on the bridge of his ship and orders his underlings to attack. He prioritizes summoning more minions after Juki kills the previous wave to prevent him from finding his way up the bridge (and to keep ammo flowing).
 After the captain ensures that he has someone to hide behind he attacks. By ordering a nearby ship to fire her cannons upon the samurai.

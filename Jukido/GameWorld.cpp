@@ -38,20 +38,20 @@ GameWorld::GameWorld(sf::RenderWindow* window)
     m_victory.setStyle(sf::Text::Bold | sf::Text::Underlined);
     m_victory.setCharacterSize(60);
     m_victory.setPosition(map.getPositionFromTile({ 8, 4 }));
-    m_victory.setFillColor(sf::Color::Black);
+    m_victory.setFillColor(sf::Color::Blue);
 
     m_loss.setFont(m_font);
     m_loss.setString("You died");
     m_loss.setStyle(sf::Text::Bold | sf::Text::Underlined);
     m_loss.setCharacterSize(60);
     m_loss.setPosition(map.getPositionFromTile({ 8, 4 }));
-    m_loss.setFillColor(sf::Color::Black);
+    m_loss.setFillColor(sf::Color::Red);
 
     m_restart.setFont(m_font);
     m_restart.setString("Press 'R' to restart or 'Esc' to exit");
     m_restart.setCharacterSize(24);
     m_restart.setPosition(map.getPositionFromTile({ 8, 5 }));
-    m_restart.setFillColor(sf::Color::Black);
+    m_restart.setFillColor(sf::Color::Red);
 
     m_rounds.setFont(m_font);
     m_rounds.setString("");
@@ -65,6 +65,10 @@ GameWorld::GameWorld(sf::RenderWindow* window)
     m_health.setPosition(map.getPositionFromTile({ 0, 0 }));
     m_health.setFillColor(sf::Color::Black);
     
+    m_arena.setTexture(*Textures::Instance()->getTexture("ship"));
+    m_arena.scale({ window->getSize().x / m_arena.getLocalBounds().width, window->getSize().y / m_arena.getLocalBounds().height });
+    m_arena.setOrigin({ 0.f, 0.f });
+    m_arena.setPosition({ 0.f, 0.f });
 
     startGame();
 }
@@ -153,7 +157,7 @@ void GameWorld::update(float DeltaTime)
 void GameWorld::draw(sf::RenderWindow* window)
 {
     Map::GetInstance().draw(window);
-
+    window->draw(m_arena);
     for (GameObject* object : m_gameObjects)
     {
         if (object->isActive())

@@ -63,4 +63,6 @@ private:
 
 	bool m_active = false;
 	bool m_won = false;
+
+	sf::Sprite m_arena;
 };
