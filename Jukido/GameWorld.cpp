@@ -18,7 +18,9 @@ GameWorld::GameWorld(sf::RenderWindow* window)
     Minion* minion2 = new Minion(textures->getTexture("minion"));
     std::vector<Minion*> minions = { minion1, minion2 };
     std::vector<sf::Vector2f> spawns = { map.getPositionFromTile({0,7}), map.getPositionFromTile({16,7})};
-    m_boss = new Boss(minions, spawns, textures->getTexture("boss"));
+    std::vector<sf::Vector2f> cannons = 
+    { map.getPositionFromTile({2,0}), map.getPositionFromTile({5,0}), map.getPositionFromTile({9,0}), map.getPositionFromTile({14,0}) };
+    m_boss = new Boss(minions, spawns, cannons, textures->getTexture("boss"));
     m_player = new Player(textures->getTexture("player"));
 
     m_gameObjects.push_back(m_player);

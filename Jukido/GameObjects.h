@@ -20,6 +20,7 @@ class GameObject
 public:
     GameObject(const sf::Texture* texture);
     GameObject() {};
+    ~GameObject();
 
     virtual void PostInit() {}
     virtual void update(float deltaTime);
@@ -28,7 +29,7 @@ public:
     //Let's consider for now EVERY GameObject have Position and ONE Sprite
     //It may change in future, for example we will need GameObject without physical/visual body represantation
     //or with several sprites combined
-    void setPosition(const sf::Vector2f& position);
+    virtual void setPosition(const sf::Vector2f& position);
     sf::Vector2f getPosition() const;
 
     virtual void updatePosition(float dt);

@@ -23,7 +23,7 @@ class Slash : public Projectile
 public:
 	Slash(sf::Texture* texture, GameObject* owner);
 
-	void activate(float damage, sf::Vector2f direction, float longevity);
+	void activate(float damage, sf::Vector2f direction, float longevity) override;
 
 	void update(float deltaTime) override;
 
@@ -40,10 +40,30 @@ public:
 
 	void updatePosition(float dt) override;
 
-	void activate(float damage, sf::Vector2f direction, float longevity);
+	void activate(float damage, sf::Vector2f direction, float longevity) override;
 
 	void update(float deltaTime) override;
 
 protected:
 	float m_speed = 5000.f;
+};
+
+class CannonBall : public Bullet
+{
+public:
+	CannonBall(sf::Texture* texture, sf::Texture* target_texture, GameObject* owner);
+
+	void activate(float damage, sf::Vector2f direction, float longevity) override;
+
+	void setPosition(const sf::Vector2f& position) override;
+
+	void update(float dt) override;
+
+	void draw(sf::RenderWindow* window) override;
+
+private:
+	float m_windup = 2.f;
+	float m_speed = 400.f;
+	sf::Texture m_target_texture;
+	sf::Sprite m_target_sprite;
 };

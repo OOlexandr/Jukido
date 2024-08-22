@@ -13,7 +13,7 @@ public:
 class Boss : public GameObject
 {
 public:
-    Boss(const std::vector<Minion*>& minions, std::vector<sf::Vector2f> spawn_points, sf::Texture* texture);
+    Boss(const std::vector<Minion*>& minions, std::vector<sf::Vector2f> spawn_points, std::vector<sf::Vector2f> cannon_points, sf::Texture* texture);
     Boss() {}
 
     void PostInit() override;
@@ -22,4 +22,5 @@ public:
 protected:
     std::vector<Minion*> m_minions;
     std::vector<sf::Vector2f> m_spawn_points;
+    std::vector<sf::Vector2f> m_cannon_points;
 };

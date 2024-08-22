@@ -9,6 +9,7 @@ class Behavior : public Component
 {
 public:
 	Behavior(GameObject* owner) : m_owner(owner) {}
+	~Behavior();
 
 	sf::Vector2f getVectorToPlayer();
 	void update(float deltaTime);
@@ -40,12 +41,17 @@ protected:
 class BossBehavior : public Behavior
 {
 public:
-	BossBehavior(GameObject* owner, const std::vector<Minion*>& minions, std::vector<sf::Vector2f> spawn_points);
+	BossBehavior(GameObject* owner, const std::vector<Minion*>& minions, std::vector<sf::Vector2f> spawn_points, std::vector<sf::Vector2f> cannon);
 	void decision() override;
 	int getNumberOfActiveMinions();
 	void spawnMinions();
+	void fireCannons();
 
 protected:
 	std::vector<Minion*> m_minions;
 	std::vector<sf::Vector2f> m_spawn_points;
+
+	std::vector<sf::Vector2f> m_cannon_points;
+	CannonBall* m_cannonball1 = nullptr;
+	CannonBall* m_cannonball2 = nullptr;
 };

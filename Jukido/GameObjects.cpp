@@ -17,6 +17,14 @@ GameObject::GameObject(const sf::Texture* texture)
 	m_sprite.setOrigin({ float(m_texture.getSize().x / 2), float(m_texture.getSize().y / 2) });
 }
 
+GameObject::~GameObject()
+{
+	for (Component* c : m_components)
+	{
+		delete c;
+	}
+}
+
 void GameObject::update(float deltaTime)
 {
 	for (Component* component : m_components)

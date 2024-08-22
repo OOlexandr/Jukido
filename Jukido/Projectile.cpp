@@ -149,3 +149,47 @@ void Bullet::update(float deltaTime)
 		}
 	}
 }
+
+CannonBall::CannonBall(sf::Texture* texture, sf::Texture* target_texture, GameObject* owner) : Bullet(texture, owner)
+{
+	m_target_texture = *target_texture;
+	m_target_sprite.setTexture(m_target_texture);
+	m_target_sprite.setOrigin({ float(m_texture.getSize().x / 2), 0.f });
+}
+
+void CannonBall::activate(float damage, sf::Vector2f direction, float longevity)
+{
+	Bullet::activate(damage, { 0.f, 1.f }, longevity);
+	setPosition(direction); // Yes, this is dirty.
+	m_windup = 2.f;
+}
+
+void CannonBall::setPosition(const sf::Vector2f& position)
+{
+	GameObject::setPosition(position);
+	m_target_sprite.setPosition(position);
+}
+
+void CannonBall::update(float dt)
+{
+	if (m_windup > 0)
+	{
+		m_windup -= dt;
+	}
+	else
+	{
+		Bullet::update(dt);
+	}
+}
+
+void CannonBall::draw(sf::RenderWindow* window)
+{
+	if (m_windup > 0)
+	{
+		window->draw(m_target_sprite);
+	}
+	else
+	{
+		Bullet::draw(window);
+	}
+}
