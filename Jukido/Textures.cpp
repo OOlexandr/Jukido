@@ -5,8 +5,8 @@ Textures* Textures::ms_textures = nullptr;
 Textures::Textures()
 {
 	sf::Texture minion, player, boss, bullet, cannonball, target, slash_player0, slash_player1, slash_player2, slash_enemy;
-	minion.loadFromFile("BOX.png");
-	boss.loadFromFile("stone.png");
+	minion.loadFromFile("shark.png");
+	boss.loadFromFile("pirate.png");
 	player.loadFromFile("player.png");
 	bullet.loadFromFile("ball2.png");
 	cannonball.loadFromFile("ball.png");
