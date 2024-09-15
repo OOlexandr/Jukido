@@ -1,20 +1,65 @@
-// Jukido.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 
-#include <iostream>
+#include "GameState.h"
+#include "GameStateManager.h"
+#include "WindowHelper.h"
+#include "GameWorld.h"
+#include "Textures.h"
+#include "Sounds.h"
+
+void handleSystemEvents(sf::RenderWindow& window)
+{
+    sf::Event event;
+    while (window.pollEvent(event))
+    {
+        switch (event.type)
+        {
+        case sf::Event::Closed:
+            window.close();
+            break;
+        case sf::Event::KeyPressed:
+            if (event.key.code == sf::Keyboard::Key::Escape)
+                window.close();
+        default:
+            break;
+        }
+    }
+}
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    srand(time(0));
+
+    sf::RenderWindow& window = WindowHelper::Instance().GetRenderWindow();
+
+    Textures::createInstance();
+    Sounds::createInstance();
+
+    GameWorld::createInstance(&window);
+    GameWorld::Instance()->PostInit();
+
+    GameWorld* gameWorld = GameWorld::Instance();
+    GameStateManager gameStateManager(gameWorld, GameStateId::Playing);
+
+    sf::Clock clock;
+
+    while (window.isOpen())
+    {
+        const float deltaTime = clock.restart().asSeconds();
+
+        handleSystemEvents(window);
+
+        gameStateManager.getCurrentGameState()->update(deltaTime);
+        gameStateManager.getCurrentGameState()->draw(&window);
+        gameStateManager.getCurrentGameState()->updateState();
+
+        window.display();
+    }
+
+    GameWorld::destroyInstance();
+    Textures::destroyInstance();
+    Sounds::destroyInstance();
+
+    return 0;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
